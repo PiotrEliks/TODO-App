@@ -1,8 +1,6 @@
-body {
-  background: rgb(124,58,237);
-  background: linear-gradient(90deg, rgba(124,58,237,1) 20%, rgba(79,70,229,1) 80%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }

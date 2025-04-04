@@ -21,7 +21,7 @@ function Todo() {
     <div className="w-full h-full">
         {tasks.map((task) => (
             <div key={task._id} className="grid grid-cols-3 gap-10 border-b-1 text-center p-3">
-                <div>{task.task}</div>
+                <div className={`${task.done ? 'line-through' : ''}`}>{task.task}</div>
                 <div className="flex justify-center">
                     <span 
                         className="cursor-pointer"

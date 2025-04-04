@@ -4,8 +4,7 @@ import { AppComponent } from './app.component';
 import { TodoComponent } from './components/todo/todo.component';
 import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
-import { Check } from 'lucide';
+import { LucideAngularModule, File, Home, Menu, UserCheck } from 'lucide-angular';
 
 @NgModule({
   declarations: [
@@ -15,7 +14,7 @@ import { Check } from 'lucide';
   imports: [
     BrowserModule,
     FormsModule,
-    LucideAngularModule.pick({ Check })
+    LucideAngularModule.pick({File, Home, Menu, UserCheck})
   ],
   providers: [provideHttpClient()],
   bootstrap: [AppComponent]
