@@ -10,11 +10,15 @@ function Todo() {
   }, [getAllTasks])
 
   if (areTasksLoading) {
-    return <Loader2 className="size-7 animate-spin"/>
+    return (
+        <div className="w-full h-full flex justify-center items-center">
+            <Loader2 className="size-7 animate-spin"/>
+        </div> 
+    )
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
         {tasks.map((task) => (
             <div key={task._id} className="grid grid-cols-3 gap-10 border-b-1 text-center p-3">
                 <div>{task.task}</div>
