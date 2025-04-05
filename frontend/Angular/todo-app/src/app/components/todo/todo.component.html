@@ -9,13 +9,20 @@
     </div>
     <div class="todo-list-head">
       Zrobione?
-      <fa-icon [icon]="faCheck"></fa-icon>
     </div>
   </div>
   <div class="todo-list">
     <div *ngFor="let task of tasks" class="todo">
       <span [ngClass]="{'done': task.done}">{{ task.task }}</span>
-      <input type="checkbox" [checked]="task.done" (change)="toggleTask(task)">
+      <div class="done-icon" (click)="toggleTask(task)">
+        <fa-icon
+          [icon]="task.done ? faCheck : faTimes"
+          [ngClass]="{
+            'text-green': task.done,
+            'text-red': !task.done
+          }"
+        ></fa-icon>
+      </div>
       <div>
         <button (click)="deleteTask(task._id!)" class="btn">Usuń</button>
       </div>

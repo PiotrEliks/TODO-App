@@ -98,11 +98,31 @@
   color: white;
   border: none;
   border-radius: 0.75rem;
-  padding: 0.5rem 1rem; 
+  padding: 0.5rem 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .todo .btn:hover {
   background-color: rgba(185, 28, 28, 0.7);
+}
+
+.done-icon {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.done-icon:hover {
+  transform: scale(1.5);
+}
+
+.text-green {
+  color: #22c55e;
+}
+
+.text-red {
+  color: #ef4444;
 }
