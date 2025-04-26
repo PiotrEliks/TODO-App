@@ -57,7 +57,7 @@
         <div class="flex justify-end">
           <button
             on:click={() => deleteTodo(todo._id)}
-            class="flex items-center gap-1 bg-red-700 hover:bg-red-700/70 text-white rounded-xl px-2 py-1"
+            class="flex items-center gap-1 bg-red-700 hover:bg-red-700/70 text-white rounded-xl px-2 py-1 cursor-pointer"
           >
             <Trash2 class="size-5" /> Usuń
           </button>
