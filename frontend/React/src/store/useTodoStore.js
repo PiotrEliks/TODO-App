@@ -7,31 +7,29 @@ export const useTodoStore = create((set, get) => ({
   areTasksLoading: false,
 
   createTask: async (task, done) => {
-    set({ areTasksLoading: true });
     try {
       const res = await axiosInstance.post("/task/new", {
         task,
         done,
       });
-      set({ tasks: res.data });
+      set(state => ({ tasks: [...state.tasks, res.data] }))
       toast.success("Task has been created");
     } catch (error) {
+      toast.error("Error, task not created");
       console.log("Error in createTask", error);
-    } finally {
-        set({ areTasksLoading: false });
     }
   },
 
   deleteTask: async (id) => {
-    set({ areTasksLoading: true });
     try {
-        const res = await axiosInstance.delete(`/task/${id}/delete`);
-        set({ tasks: res.data });
+        await axiosInstance.delete(`/task/${id}/delete`);
+        set(state => ({
+          tasks: state.tasks.filter(t => t._id !== id)
+        }))
         toast.success("Task has been deleted")
     } catch (error) {
-        console.log("Error in deleteTask", error);
-    } finally {
-        set({ areTasksLoading: false });
+      toast.error("Error, task not deleted");
+      console.log("Error in deleteTask", error);
     }
   },
 
@@ -57,16 +55,18 @@ export const useTodoStore = create((set, get) => ({
   },
 
   updateTask: async (id, done) => {
-    set({ areTasksLoading: true });
     try {
-      const res = await axiosInstance.put(`/task/${id}/update`, {
+      await axiosInstance.put(`/task/${id}/update`, {
         done
       });
-      set({ tasks: res.data });
+      set(state => ({
+        tasks: state.tasks.map(t =>
+          t._id === id ? { ...t, done } : t
+        )
+      }))
     } catch (error) {
+      toast.error("Error, task not updated");
       console.log("Error in updateTask", error);
-    } finally {
-      set({ areTasksLoading: false });
     }
   }
 }));

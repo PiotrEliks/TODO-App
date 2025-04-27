@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTodoStore } from '../store/useTodoStore'
-import { Plus, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 
 const CreateTodo = () => {
   const { createTask } = useTodoStore();
