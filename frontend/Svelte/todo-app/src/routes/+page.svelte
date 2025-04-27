@@ -1,31 +1,36 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import CreateTodo from "$lib/components/CreateTodo.svelte";
   import TodoList from "$lib/components/TodoList.svelte";
-  import { CirclePlus } from "lucide-svelte";
-  type Todo = { _id: string; task: string; done: boolean };
+  import type { Todo } from "$lib/types/todo";
   export let data;
-  let { todos } = data;
-  let newTask = "";
 
-  async function addTodo() {
-    if (!newTask.trim()) return;
-    const res = await fetch("/api/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ task: newTask }),
-    });
-    if (res.ok) {
-      const todo: Todo = await res.json();
-      todos = [...todos, todo];
-      newTask = "";
-    }
+  let todos: Todo[] = data.todos;
+
+  let filter: "all" | "done" | "not_done" = "all";
+
+  function onAdd(e: CustomEvent<Todo>) {
+    todos = [...todos, e.detail];
+  }
+  function onUpdate(e: CustomEvent<Todo>) {
+    todos = todos.map((t) => (t._id === e.detail._id ? e.detail : t));
+  }
+  function onDelete(e: CustomEvent<string>) {
+    todos = todos.filter((t) => t._id !== e.detail);
   }
 
-  function onUpdate(event: CustomEvent<Todo>) {
-    todos = todos.map((t) => (t._id === event.detail._id ? event.detail : t));
+  async function fetchTodos(status: typeof filter) {
+    const res = await fetch(`/api/todos?status=${status}`);
+    todos = await res.json();
   }
 
-  function onDelete(event: CustomEvent<string>) {
-    todos = todos.filter((t) => t._id !== event.detail);
+  onMount(() => {
+    fetchTodos(filter);
+  });
+
+  $: if (browser) {
+    fetchTodos(filter);
   }
 </script>
 
@@ -35,20 +40,16 @@
   <div
     class="bg-white rounded-2xl p-5 min-w-3/4 shadow-2xl h-3/4 flex flex-col justify-center items-center"
   >
-    <div class="w-full flex justify-center mb-5">
-      <form
-        on:submit|preventDefault={addTodo}
-        class="flex space-x-2 mb-4 w-3/4 relative"
-      >
-        <input
-          bind:value={newTask}
-          placeholder="Nowe zadanie"
-          class="border-2 rounded-lg p-2 w-full pr-9"
-        />
-        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-4">
-          <CirclePlus class="text-green-600 size-6 cursor-pointer" />
-        </button>
-      </form>
+    <div class="mb-4 flex items-center space-x-4 w-3/4">
+      <label>
+        Pokaż:
+        <select bind:value={filter} class="ml-2 border rounded p-1">
+          <option value="all">Wszystkie</option>
+          <option value="done">Zrobione</option>
+          <option value="not_done">Niezrobione</option>
+        </select>
+      </label>
+      <CreateTodo on:add={onAdd} />
     </div>
 
     <div class="flex-grow overflow-y-auto w-full">
@@ -56,6 +57,3 @@
     </div>
   </div>
 </main>
-
-<style>
-</style>

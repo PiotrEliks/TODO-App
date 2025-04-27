@@ -2,7 +2,6 @@
   import { createEventDispatcher } from "svelte";
   import { CirclePlus } from "lucide-svelte";
   import type { Todo } from "$lib/types/todo";
-  export let todos: Todo[];
 
   const dispatch = createEventDispatcher<{ add: Todo }>();
   let newTask = "";
@@ -17,7 +16,6 @@
     if (res.ok) {
       const todo: Todo = await res.json();
       dispatch("add", todo);
-      todos = [...todos, todo];
       newTask = "";
     }
   }

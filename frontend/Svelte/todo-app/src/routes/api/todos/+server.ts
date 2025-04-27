@@ -2,9 +2,24 @@ import type { RequestHandler } from './$types';
 import { getTodosCollection } from '$lib/db';
 import { json } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async () => {
-  const todos = await (await getTodosCollection()).find().toArray();
-  return json(todos);
+export const GET: RequestHandler = async ({ url }) => {
+  const status = url.searchParams.get('status') || 'all';
+
+  const filter: Record<string, unknown> = {};
+  if (status === 'done') {
+    filter.done = true;
+  } else if (status === 'not_done') {
+    filter.done = false;
+  }
+
+  const col = await getTodosCollection();
+  const todos = await col.find(filter).toArray();
+  const out = todos.map(({ _id, task, done }) => ({
+    _id: _id.toString(),
+    task,
+    done
+  }));
+  return json(out);
 };
 
 export const POST: RequestHandler = async ({ request }) => {
