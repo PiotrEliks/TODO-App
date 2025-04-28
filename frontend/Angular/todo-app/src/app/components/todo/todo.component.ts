@@ -3,7 +3,7 @@ import { TaskService, Task } from '../../services/task.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-todo',
@@ -14,13 +14,27 @@ import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 export class TodoComponent implements OnInit {
   faCheck = faCheck;
   faTimes = faTimes;
+  faTrash = faTrash;
   tasks: Task[] = [];
   newTaskText: string = '';
+
+  filter: 'all' | 'done' | 'notDone' = 'all';
 
   constructor(private taskService: TaskService) { }
 
   ngOnInit(): void {
     this.loadTasks();
+  }
+
+  get filteredTasks(): Task[] {
+    switch (this.filter) {
+      case 'done':
+        return this.tasks.filter(t => t.done);
+      case 'notDone':
+        return this.tasks.filter(t => !t.done);
+      default:
+        return this.tasks;
+    }
   }
 
   loadTasks(): void {
@@ -39,11 +53,12 @@ export class TodoComponent implements OnInit {
       done: false
     };
 
-    this.taskService.createTask(newTask).subscribe(tasks => {
-      this.tasks = tasks;
-      this.newTaskText = '';
-    }, error => {
-      console.error('Błąd dodawania zadania:', error);
+    this.taskService.createTask(newTask).subscribe({
+      next: createdTask => {
+        this.tasks.push(createdTask);
+        this.newTaskText = '';
+      },
+      error: err => console.error('Błąd dodawania:', err),
     });
   }
 

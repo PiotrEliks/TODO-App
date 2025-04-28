@@ -1,5 +1,13 @@
 <div class="todo-container">
   <div class="add-task">
+    <div class="todo-filter">
+      Pokaż:
+      <select [(ngModel)]="filter">
+        <option value="all">Wszystkie</option>
+        <option value="done">Zrobione</option>
+        <option value="notDone">Niezrobione</option>
+      </select>
+    </div>
     <input type="text" placeholder="Nowe zadanie" [(ngModel)]="newTaskText">
     <button (click)="addTask()">+</button>
   </div>
@@ -12,7 +20,7 @@
     </div>
   </div>
   <div class="todo-list">
-    <div *ngFor="let task of tasks" class="todo">
+    <div *ngFor="let task of filteredTasks" class="todo">
       <span [ngClass]="{'done': task.done}">{{ task.task }}</span>
       <div class="done-icon" (click)="toggleTask(task)">
         <fa-icon
@@ -24,7 +32,7 @@
         ></fa-icon>
       </div>
       <div>
-        <button (click)="deleteTask(task._id!)" class="btn">Usuń</button>
+        <button (click)="deleteTask(task._id!)" class="btn"><fa-icon [icon]="faTrash"></fa-icon>Usuń</button>
       </div>
     </div>
   </div>

@@ -24,8 +24,8 @@ export class TaskService {
     return this.http.get<Task>(`${this.apiUrl}/${id}`);
   }
 
-  createTask(task: Task): Observable<Task[]> {
-    return this.http.post<Task[]>(`${this.apiUrl}/new`, task);
+  createTask(task: Task): Observable<Task> {
+    return this.http.post<Task>(`${this.apiUrl}/new`, task);
   }
 
   updateTask(id: string, task: Task): Observable<Task[]> {
