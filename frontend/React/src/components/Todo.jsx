@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTodoStore } from '../store/useTodoStore'
 import { Loader2, Trash2, Check, X, Pencil } from 'lucide-react'
 
 function Todo({ filter }) {
   const { tasks, getAllTasks, toggleEdit, saveTask, cancelEdit, deleteTask, areTasksLoading, updateTask } = useTodoStore();
+  const [editingTodoText, setEditingTodoText] = useState({});
 
   useEffect(() => {
     getAllTasks();
@@ -53,13 +54,8 @@ function Todo({ filter }) {
               {task.isEditing ? (
                 <input
                   type="text"
-                  defaultValue={task.task}
-                  onBlur={(e) => handleSave(task._id, e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSave(task._id, e.target.value);
-                    }
-                  }}
+                  defaultValue={editingTodoText[task._id] || task.task}
+                  onChange={(e) => setEditingTodoText(prev => ({ ...prev, [task._id]: e.target.value }))}
                   className="p-2 border border-gray-300 rounded-md w-full"
                 />
               ) : (
@@ -68,7 +64,7 @@ function Todo({ filter }) {
               <div className="todo-icons flex gap-0.5">
                 {task.isEditing? (
                   <>
-                    <Check onClick={() => handleSave(task._id, task.task)} className="cursor-pointer text-green-500" />
+                    <Check onClick={() => handleSave(task._id, editingTodoText[task._id])} className="cursor-pointer text-green-500" />
                     /
                     <X onClick={() => handleCancel(task._id)} className="cursor-pointer text-red-500" />
                   </>
