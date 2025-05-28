@@ -5,14 +5,14 @@ import { ObjectId } from 'mongodb';
 
 export const PUT: RequestHandler = async ({ params, request }) => {
   const { id } = params;
-  const { done } = await request.json();
+  const { done, task } = await request.json();
   if (typeof done !== 'boolean') {
     return json({ error: 'Invalid done flag' }, { status: 400 });
   }
   const col = await getTodosCollection();
   const result = await col.updateOne(
     { _id: new ObjectId(id) },
-    { $set: { done } }
+    { $set: { done, task } }
   );
   if (result.matchedCount === 0) {
     return json({ error: 'Not found' }, { status: 404 });

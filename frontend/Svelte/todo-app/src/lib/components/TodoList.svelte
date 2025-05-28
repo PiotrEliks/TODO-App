@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { Trash2, Check, X } from "lucide-svelte";
+  import { Trash2, Check, X, Pencil } from "lucide-svelte";
   import type { Todo } from "$lib/types/todo";
 
   export let todos: Todo[] = [];
@@ -8,6 +8,8 @@
     delete: string;
     update: Todo;
   }>();
+
+  let editingTodoText: { [key: string]: string } = {};
 
   async function deleteTodo(id: string) {
     await fetch(`/api/todos/${id}`, { method: "DELETE" });
@@ -18,12 +20,42 @@
     const res = await fetch(`/api/todos/${todo._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ done: !todo.done }),
+      body: JSON.stringify({ done: !todo.done, task: todo.task }),
     });
     if (res.ok) {
       dispatch("update", { ...todo, done: !todo.done });
     }
   }
+
+  async function saveTask(todo: Todo, newTaskText: string) {
+    const res = await fetch(`/api/todos/${todo._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task: newTaskText, done: todo.done }),
+    });
+
+    if (res.ok) {
+      dispatch("update", { ...todo, task: newTaskText, isEditing: false });
+    }
+  }
+
+  function cancelEdit(todo: Todo) {
+    dispatch("update", { ...todo, isEditing: false });
+  }
+
+  function toggleEdit(todo: Todo) {
+      console.log("Toggling edit for todo:", todo);
+      editingTodoText[todo._id] = todo.task;
+      dispatch("update", { ...todo, isEditing: true });
+    }
+
+  const handleSave = (todo: Todo, newTaskText: string) => {
+    if (!newTaskText.trim()) {
+      deleteTodo(todo._id);
+    } else {
+      saveTask(todo, newTaskText);
+    }
+  };
 </script>
 
 <div class="flex-grow overflow-y-auto w-full">
@@ -43,11 +75,46 @@
         <div
           class="grid grid-cols-3 gap-10 border-b text-center p-3 items-center"
         >
-          <div class={todo.done ? "line-through opacity-60" : ""}>
-            {todo.task}
+          <div class="todo-text flex items-center gap-1 justify-self-start">
+            {#if todo.isEditing}
+              <input
+                type="text"
+                bind:value={editingTodoText[todo._id]}
+                defaultValue={editingTodoText[todo._id] || todo.task}
+                class="p-2 border border-gray-300 rounded-md w-full"
+                on:change={(e:any) => editingTodoText[todo._id] = e.target.value}
+              />
+            {:else}
+              <span class={`flex-1 ${todo.done ? 'line-through text-gray-500' : ''}`} >
+                {todo.task}
+              </span>
+            {/if}
+            <div class="todo-icons flex gap-0.5">
+              {#if todo.isEditing}
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <span on:click={() => handleSave(todo, editingTodoText[todo._id])} >
+                <Check class="cursor-pointer text-green-500" />
+              </span>
+                  /
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <span on:click={() => cancelEdit(todo)}>
+                  <X class="cursor-pointer text-red-500" />
+                </span>
+              {:else}
+                {#if !todo.done}
+                  <!-- svelte-ignore a11y_click_events_have_key_events -->
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <span on:click={() => toggleEdit(todo)}>
+                    <Pencil class="cursor-pointer text-blue-500 size-4" />
+                  </span>
+                {/if}
+              {/if}
+            </div>
           </div>
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="flex justify-center">
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <span class="cursor-pointer" on:click={() => toggleDone(todo)}>
               {#if todo.done}
@@ -72,4 +139,8 @@
 </div>
 
 <style>
+  .done {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
 </style>

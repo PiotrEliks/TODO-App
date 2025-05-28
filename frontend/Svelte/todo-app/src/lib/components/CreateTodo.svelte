@@ -21,7 +21,7 @@
   }
 </script>
 
-<form on:submit|preventDefault={add} class="flex space-x-2 mb-4 w-3/4 relative">
+<form on:submit|preventDefault={add} class="flex space-x-2 w-3/4 relative">
   <input
     bind:value={newTask}
     placeholder="Nowe zadanie"

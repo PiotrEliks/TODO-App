@@ -40,8 +40,8 @@
   <div
     class="bg-white rounded-2xl p-5 min-w-3/4 shadow-2xl h-3/4 flex flex-col justify-center items-center"
   >
-    <div class="mb-4 flex items-center space-x-4 w-3/4">
-      <label>
+    <div class="mb-4 space-x-4 w-3/4 flex justify-between items-center">
+      <label class="flex items-center justify-between flex-row">
         Pokaż:
         <select bind:value={filter} class="ml-2 border rounded p-1">
           <option value="all">Wszystkie</option>
