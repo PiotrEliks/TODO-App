@@ -10,34 +10,25 @@
     </div>
     <input type="text" placeholder="Nowe zadanie" [(ngModel)]="newTaskText">
     <button (click)="addTask()">
-      <fa-icon
-        [icon]="faPlus"
-      ></fa-icon>
+      <fa-icon [icon]="faPlus"></fa-icon>
     </button>
   </div>
   <div class="todo-list-header">
-    <div class="todo-list-head">
-      Zadanie
-    </div>
-    <div class="todo-list-head">
-      Zrobione?
-    </div>
+    <div class="todo-list-head">Zadanie</div>
+    <div class="todo-list-head">Zrobione?</div>
+    <div></div>
   </div>
   <div class="todo-list">
     <div *ngFor="let task of filteredTasks" class="todo">
       <div class="todo-text">
         <input
           type="text"
-          [(ngModel)]="task.task"
-          (keyup.enter)="saveTask(task)"
-          (blur)="saveTask(task)"
+          [(ngModel)]="editingTodoText[task._id!]"
           [ngClass]="{'done': task.done}"
           *ngIf="task.isEditing"
+          (ngModelChange)="onEditingTextChange(task._id!, $event)"
         />
-        <span
-          [ngClass]="{'done': task.done}"
-          *ngIf="!task.isEditing"  
-        >
+        <span [ngClass]="{'done': task.done}" *ngIf="!task.isEditing">
           {{ task.task }}
         </span>
         <div class="todo-icons">
@@ -62,17 +53,18 @@
           ></fa-icon>
         </div>
       </div>
-      <div class="done-icon" (click)="updateTask(task)">
+      <div>
         <fa-icon
+          class="done-icon"
+          (click)="updateTask(task)"
           [icon]="task.done ? faCheck : faTimes"
-          [ngClass]="{
-            'text-green': task.done,
-            'text-red': !task.done
-          }"
+          [ngClass]="{ 'text-green': task.done, 'text-red': !task.done }"
         ></fa-icon>
       </div>
       <div>
-        <button (click)="deleteTask(task._id!)" class="btn"><fa-icon [icon]="faTrash"></fa-icon>Usuń</button>
+        <button (click)="deleteTask(task._id!)" class="btn">
+          <fa-icon [icon]="faTrash"></fa-icon>Usuń
+        </button>
       </div>
     </div>
   </div>
