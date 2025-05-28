@@ -1,13 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useTodoStore } from '../store/useTodoStore'
-import { Loader2, Trash2, Check, X } from 'lucide-react'
+import { Loader2, Trash2, Check, X, Pencil } from 'lucide-react'
 
 function Todo({ filter }) {
-  const { tasks, areTasksLoading, createTask, deleteTask, getAllTasks, getTaskById, updateTask } = useTodoStore();
+  const { tasks, getAllTasks, toggleEdit, saveTask, cancelEdit, deleteTask, areTasksLoading, updateTask } = useTodoStore();
 
   useEffect(() => {
     getAllTasks();
   }, [getAllTasks]);
+
+  const handleEdit = (taskId) => {
+    toggleEdit(taskId);
+  };
+
+  const handleSave = (taskId, newTaskText) => {
+    if (!newTaskText.trim()) {
+      deleteTask(taskId);
+    } else {
+      saveTask(taskId, newTaskText);
+    }
+  };
+
+  const handleCancel = (taskId) => {
+    cancelEdit(taskId);
+  };
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'done') return task.done
@@ -33,8 +49,33 @@ function Todo({ filter }) {
             key={task._id}
             className="grid grid-cols-3 gap-10 border-b-1 text-center p-3"
           >
-            <div className={task.done ? 'line-through opacity-60' : ''}>
-              {task.task}
+            <div className="todo-text flex items-center gap-1 justify-self-start">
+              {task.isEditing ? (
+                <input
+                  type="text"
+                  defaultValue={task.task}
+                  onBlur={(e) => handleSave(task._id, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSave(task._id, e.target.value);
+                    }
+                  }}
+                  className="p-2 border border-gray-300 rounded-md w-full"
+                />
+              ) : (
+                <span className={`flex-1 ${task.done ? 'line-through text-gray-500' : ''}`}>{task.task}</span>
+              )}
+              <div className="todo-icons flex gap-0.5">
+                {task.isEditing? (
+                  <>
+                    <Check onClick={() => handleSave(task._id, task.task)} className="cursor-pointer text-green-500" />
+                    /
+                    <X onClick={() => handleCancel(task._id)} className="cursor-pointer text-red-500" />
+                  </>
+                ) : (
+                  !task.done && <Pencil onClick={() => handleEdit(task._id)} className="cursor-pointer text-blue-500 size-4" />
+                )}
+              </div>
             </div>
             <div className="flex justify-center">
               <button

@@ -37,20 +37,15 @@ export const useTodoStore = create((set, get) => ({
     set({ areTasksLoading: true });
     try {
       const res = await axiosInstance.get("/task/all");
-      set({ tasks: res.data });
+      const tasksWithEditing = res.data.map(task => ({
+        ...task,
+        isEditing: false,
+      }));
+      set({ tasks: tasksWithEditing });
     } catch (error) {
       console.log("Error in getAllTask", error);
     } finally {
       set({ areTasksLoading: false });
-    }
-  },
-
-  getTaskById: async (id) => {
-    try {
-      const res = await axiosInstance.get(`/task/${id}`);
-      set({ tasks: res.data });
-    } catch (error) {
-      console.log("Error in getTaskById", error);
     }
   },
 
@@ -68,5 +63,36 @@ export const useTodoStore = create((set, get) => ({
       toast.error("Error, task not updated");
       console.log("Error in updateTask", error);
     }
+  },
+
+  toggleEdit: (id) => {
+    set(state => ({
+      tasks: state.tasks.map(t =>
+        t._id === id ? { ...t, isEditing: !t.isEditing } : t
+      )
+    }));
+  },
+
+  saveTask: async (id, newTaskText) => {
+    set(state => ({
+      tasks: state.tasks.map(t =>
+        t._id === id ? { ...t, task: newTaskText, isEditing: false } : t
+      )
+    }));
+
+    try {
+      await axiosInstance.put(`/task/${id}/update`, { task: newTaskText });
+      toast.success("Task updated successfully");
+    } catch (error) {
+      toast.error("Error saving task");
+    }
+  },
+
+  cancelEdit: (id) => {
+    set(state => ({
+      tasks: state.tasks.map(t =>
+        t._id === id ? { ...t, isEditing: false } : t
+      )
+    }));
   }
 }));
