@@ -9,7 +9,11 @@
       </select>
     </div>
     <input type="text" placeholder="Nowe zadanie" [(ngModel)]="newTaskText">
-    <button (click)="addTask()">+</button>
+    <button (click)="addTask()">
+      <fa-icon
+        [icon]="faPlus"
+      ></fa-icon>
+    </button>
   </div>
   <div class="todo-list-header">
     <div class="todo-list-head">
@@ -21,8 +25,44 @@
   </div>
   <div class="todo-list">
     <div *ngFor="let task of filteredTasks" class="todo">
-      <span [ngClass]="{'done': task.done}">{{ task.task }}</span>
-      <div class="done-icon" (click)="toggleTask(task)">
+      <div class="todo-text">
+        <input
+          type="text"
+          [(ngModel)]="task.task"
+          (keyup.enter)="saveTask(task)"
+          (blur)="saveTask(task)"
+          [ngClass]="{'done': task.done}"
+          *ngIf="task.isEditing"
+        />
+        <span
+          [ngClass]="{'done': task.done}"
+          *ngIf="!task.isEditing"  
+        >
+          {{ task.task }}
+        </span>
+        <div class="todo-icons">
+          <fa-icon
+            [icon]="faPen"
+            (click)="editTask(task)"
+            *ngIf="!task.isEditing && !task.done"
+            class="edit-icon"
+          ></fa-icon>
+          <fa-icon
+            [icon]="faCheck"
+            (click)="saveTask(task)"
+            *ngIf="task.isEditing"
+            class="save-icon"
+          ></fa-icon>
+          <span *ngIf="task.isEditing">/</span>
+          <fa-icon
+            [icon]="faTimes"
+            (click)="cancelEdit(task)"
+            *ngIf="task.isEditing"
+            class="cancel-icon"
+          ></fa-icon>
+        </div>
+      </div>
+      <div class="done-icon" (click)="updateTask(task)">
         <fa-icon
           [icon]="task.done ? faCheck : faTimes"
           [ngClass]="{

@@ -3,7 +3,7 @@ import { TaskService, Task } from '../../services/task.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCheck, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faTrash, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-todo',
@@ -15,6 +15,8 @@ export class TodoComponent implements OnInit {
   faCheck = faCheck;
   faTimes = faTimes;
   faTrash = faTrash;
+  faPen = faPen;
+  faPlus = faPlus;
   tasks: Task[] = [];
   newTaskText: string = '';
 
@@ -70,7 +72,7 @@ export class TodoComponent implements OnInit {
     });
   }
 
-  toggleTask(task: Task): void {
+  updateTask(task: Task): void {
     const updatedTask = { ...task, done: !task.done };
     if (task._id) {
       this.taskService.updateTask(task._id, updatedTask).subscribe(tasks => {
@@ -78,6 +80,30 @@ export class TodoComponent implements OnInit {
       }, error => {
         console.error('Błąd aktualizacji zadania:', error);
       });
+    }
+  }
+  editTask(task: Task): void {
+    task.isEditing = true;
+  }
+  saveTask(task: Task): void {
+    if (!task.task.trim()) {
+      this.deleteTask(task._id!);
+      return;
+    }
+
+    const updatedTask = { ...task, isEditing: false };
+    if (task._id) {
+      this.taskService.updateTask(task._id, updatedTask).subscribe(tasks => {
+        this.tasks = tasks;
+      }, error => {
+        console.error('Błąd aktualizacji zadania:', error);
+      });
+    }
+  }
+  cancelEdit(task: Task): void {
+    task.isEditing = false;
+    if (!task.task.trim()) {
+      this.deleteTask(task._id!);
     }
   }
 }
